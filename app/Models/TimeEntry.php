@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class TimeEntry extends Model
 {
@@ -26,6 +26,8 @@ class TimeEntry extends Model
 
     protected $casts = [
         'date' => 'date',
+        'start_time' => 'datetime:H:i:s',
+        'end_time' => 'datetime:H:i:s',
     ];
 
     public function user()
@@ -55,6 +57,10 @@ class TimeEntry extends Model
 
     public function scopeVisible($query)
     {
-        return $query->where('status', '!=', 'deleted');
+        return $query->where(function ($query) {
+            $query
+                ->where('status', '!=', 'deleted')
+                ->orWhereNull('status');
+        });
     }
 }

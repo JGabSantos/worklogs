@@ -1,18 +1,38 @@
 <x-layouts::app :title="__('Dashboard')">
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+        <div class="space-y-8">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <flux:heading size="xl">
+                        {{ __('Dashboard') }}
+                    </flux:heading>
+                    <flux:subheading>
+                        {{ __('Get insights into your time entries and manage them effectively.') }}
+                    </flux:subheading>
+                </div>
+
+                <livewire:time-entries.create />
             </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+
+            <flux:separator />
+
+            {{-- KPIs   --}}
+            <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                <livewire:kpis.daily-hours />
+                <livewire:kpis.weekly-hours />
+                <livewire:kpis.monthly-hours />
             </div>
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-                <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+
+            {{-- Charts --}}
+            <div class="grid min-w-0 gap-4 md:grid-cols-2">
+                <livewire:charts.hours-by-client />
+                <livewire:charts.hours-by-activity-type />
             </div>
-        </div>
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
-            <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+
+            {{-- Recent entries --}}
+            <div class="space-y-4">
+                <livewire:time-entries.recents />
+            </div>
         </div>
     </div>
 </x-layouts::app>
