@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\TimeEntry;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -66,7 +65,7 @@ new class extends Component
     {
         $query = TimeEntry::query()
             ->visible()
-            ->where('user_id', Auth::id())
+            ->statusNotDraft()
             ->whereNotNull('time_entries.client_id')
             ->join('clients', 'time_entries.client_id', '=', 'clients.id')
             ->selectRaw('clients.name as client_name, SUM(time_entries.duration_minutes) as total_minutes')

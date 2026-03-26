@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class TimeEntry extends Model
 {
@@ -57,10 +58,11 @@ class TimeEntry extends Model
 
     public function scopeVisible($query)
     {
-        return $query->where(function ($query) {
-            $query
-                ->where('status', '!=', 'deleted')
-                ->orWhereNull('status');
-        });
+        return $query->where('user_id', Auth::id());
+    }
+
+    public function scopeStatusNotDraft($query)
+    {
+        return $query->where('status', '!=', 'draft');
     }
 }

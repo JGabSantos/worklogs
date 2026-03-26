@@ -141,8 +141,7 @@ class Edit extends Component
 
     private function fillFromEntry(int $id): void
     {
-        $timeEntry = Auth::user()
-            ->timeEntries()
+        $timeEntry = TimeEntry::query()
             ->visible()
             ->findOrFail($id);
 
@@ -163,8 +162,7 @@ class Edit extends Component
             abort(404, 'Time entry not found.');
         }
 
-        return Auth::user()
-            ->timeEntries()
+        return TimeEntry::query()
             ->visible()
             ->findOrFail($this->timeEntryId);
     }

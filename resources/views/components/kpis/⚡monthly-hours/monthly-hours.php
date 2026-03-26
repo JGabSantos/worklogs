@@ -24,6 +24,7 @@ new class extends Component
 
         $currentMonthMinutes = (int) $user->timeEntries()
             ->visible()
+            ->statusNotDraft()
             ->whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->sum('duration_minutes');
@@ -42,6 +43,7 @@ new class extends Component
 
         return (int) $user->timeEntries()
             ->visible()
+            ->statusNotDraft()
             ->whereYear('date', Carbon::now()->year)
             ->whereMonth('date', Carbon::now()->month)
             ->count();

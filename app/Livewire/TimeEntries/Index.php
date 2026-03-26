@@ -4,16 +4,17 @@ namespace App\Livewire\TimeEntries;
 
 use App\Models\ActivityType;
 use App\Models\Client;
+use App\Models\TimeEntry;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+
 
 class Index extends Component
 {
@@ -232,8 +233,7 @@ class Index extends Component
 
     private function buildQuery(): Builder|Relation
     {
-        $query = Auth::user()
-            ->timeEntries()
+        $query = TimeEntry::query()
             ->visible()
             ->with(['activityType', 'client']);
 

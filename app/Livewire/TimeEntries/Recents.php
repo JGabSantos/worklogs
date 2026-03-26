@@ -2,8 +2,8 @@
 
 namespace App\Livewire\TimeEntries;
 
+use App\Models\TimeEntry;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -18,8 +18,7 @@ class Recents extends Component
 
     public function render(): View
     {
-        $latestEntries = Auth::user()
-            ->timeEntries()
+        $latestEntries = TimeEntry::query()
             ->visible()
             ->with(['activityType', 'client'])
             ->latest('date')

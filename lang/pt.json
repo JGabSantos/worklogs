@@ -125,5 +125,9 @@
     "Email password reset link": "Enviar link de redefinição",
     "Or, return to": "Ou voltar para",
     "log in": "iniciar sessão",
-    "We have emailed your password reset link.": "Enviámos por e-mail o link de redefinição de palavra-passe."
+    "We have emailed your password reset link.": "Enviámos por e-mail o link de redefinição de palavra-passe.",
+    "Authentication code": "Código de autenticação",
+    "Enter the authentication code provided by your authenticator application.": "Introduza o código de autenticação fornecido pela sua aplicação de autenticação.",
+    "or you can": "ou pode",
+    "login using a recovery code": "iniciar sessão usando um código de recuperação"
 }

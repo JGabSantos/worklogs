@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\TimeEntry;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -66,7 +65,7 @@ new class extends Component
     {
         $query = TimeEntry::query()
             ->visible()
-            ->where('user_id', Auth::id())
+            ->statusNotDraft()
             ->whereNotNull('time_entries.activity_type_id')
             ->join('activity_types', 'time_entries.activity_type_id', '=', 'activity_types.id')
             ->selectRaw('activity_types.name as activity_name, SUM(time_entries.duration_minutes) as total_minutes')

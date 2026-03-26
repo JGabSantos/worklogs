@@ -25,6 +25,7 @@ new class extends Component
 
         $currentWeekMinutes = (int) $user->timeEntries()
             ->visible()
+            ->statusNotDraft()
             ->whereBetween('date', [
                 Carbon::now()->startOfWeek()->toDateString(),
                 Carbon::now()->endOfWeek()->toDateString(),
@@ -45,6 +46,7 @@ new class extends Component
 
         return (int) $user->timeEntries()
             ->visible()
+            ->statusNotDraft()
             ->whereBetween('date', [
                 Carbon::now()->startOfWeek()->toDateString(),
                 Carbon::now()->endOfWeek()->toDateString(),
