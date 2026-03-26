@@ -183,8 +183,8 @@ class Create extends Component
         return [
             ...$validated,
             'date' => Carbon::createFromFormat('d/m/Y', $validated['date'])->toDateString(),
-            'start_time' => $validated['start_time'].':00',
-            'end_time' => $validated['end_time'].':00',
+            'start_time' => $validated['start_time'] . ':00',
+            'end_time' => $validated['end_time'] . ':00',
         ];
     }
 
@@ -270,8 +270,8 @@ class Create extends Component
 
         $query->when(
             $modelClass === ActivityType::class,
-            fn (Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
-            fn (Builder $q) => $q->orderBy('name'),
+            fn(Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
+            fn(Builder $q) => $q->orderBy('name'),
         );
 
         return $query->limit(8)->get();

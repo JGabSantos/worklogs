@@ -11,7 +11,15 @@
                     </flux:subheading>
                 </div>
 
-                <livewire:time-entries.create />
+                <div>
+                    <flux:modal.trigger name="time-entries.create" variant="primary">
+                        <flux:button variant="primary" icon="plus">
+                            {{ __('New entry') }}
+                        </flux:button>
+                    </flux:modal.trigger>
+
+                    <livewire:time-entries.create />
+                </div>
             </div>
 
             <flux:separator />

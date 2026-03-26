@@ -2,7 +2,7 @@
     <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
             <flux:heading size="md">{{ __('Hours by activity') }}</flux:heading>
-            <flux:subheading class="text-sm">{{ __('Share of total time by task type') }}</flux:subheading>
+            <flux:subheading class="text-sm">{{ __('Percentage of hours by type of activity') }}</flux:subheading>
         </div>
 
         <flux:select wire:model.live="period" class="w-full shrink-0 text-sm sm:w-36">
@@ -150,6 +150,8 @@
             }
 
             const buildOptions = (series, categories) => {
+                const TRANSLATIONS = @js(collect($chart['categories'])->mapWithKeys(fn($c) => [$c => __($c)]))
+
                 const t = resolveTheme()
                 return {
                     chart: {
@@ -173,7 +175,7 @@
                         mode: t.mode
                     },
                     series,
-                    labels: categories,
+                    labels: categories.map(c => TRANSLATIONS[c] ?? c),
                     colors: generatePalette(series.length, t.mode),
                     stroke: {
                         width: 2,

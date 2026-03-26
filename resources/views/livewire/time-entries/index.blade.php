@@ -80,8 +80,8 @@
                     <flux:table.column sortable :sorted="$sortBy === 'date'" :direction="$orderBy"
                         wire:click="sort('date')">{{ __('Date') }}</flux:table.column>
 
-                    <flux:table.column>{{ __('Start') }}</flux:table.column>
-                    <flux:table.column>{{ __('End') }}</flux:table.column>
+                    <flux:table.column>{{ __('Start time') }}</flux:table.column>
+                    <flux:table.column>{{ __('End time') }}</flux:table.column>
 
                     <flux:table.column sortable :sorted="$sortBy === 'duration_minutes'" :direction="$orderBy"
                         wire:click="sort('duration_minutes')">{{ __('Duration') }}</flux:table.column>
@@ -123,7 +123,7 @@
                                         </flux:menu.item>
                                         <flux:menu.separator />
                                         <flux:menu.item variant="danger"
-                                            :href="route('time-entries.destroy', $entry->id)" method="delete">
+                                            wire:click="$dispatch('open-delete-time-entry-modal', { id: {{ $entry->id }} })">
                                             {{ __('Delete') }}
                                         </flux:menu.item>
                                     </flux:menu>

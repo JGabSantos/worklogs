@@ -3,14 +3,14 @@
         <div class="space-y-1">
             <flux:heading size="lg">{{ __('Edit entry') }}</flux:heading>
             <flux:subheading>
-                {{ __('Update the details of your time entry. Make sure to save the changes once you are done.') }}
+                {{ __('Update the details of your time entry. Make sure to save changes before closing') }}
             </flux:subheading>
         </div>
 
         <form wire:submit="save" class="space-y-6">
             @if ($errorMessage)
                 <flux:callout variant="danger" icon="exclamation-triangle">
-                    {{ $errorMessage }}
+                    {{ __($errorMessage) }}
                 </flux:callout>
             @endif
 
@@ -38,13 +38,17 @@
                     emptyMessage="{{ __('No clients found.') }}" />
 
                 <flux:select name="status" wire:model="status" label="Status" required>
-                    <flux:select.option value="draft">Draft</flux:select.option>
-                    <flux:select.option value="active">Active</flux:select.option>
+                    <flux:select.option value="draft">
+                        {{ __('Draft') }}
+                    </flux:select.option>
+                    <flux:select.option value="active">
+                        {{ __('Active') }}
+                    </flux:select.option>
                 </flux:select>
             </div>
 
-            <flux:textarea name="description" label="Description" wire:model.blur="description" rows="5"
-                placeholder="Add notes about the work completed" required />
+            <flux:textarea name="description" label="{{ __('Description') }}" wire:model.blur="description"
+                rows="5" placeholder="{{ __('Add notes about the work completed') }}" required />
 
             <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <flux:button type="button" wire:click="closeModal" variant="ghost">
@@ -52,7 +56,7 @@
                 </flux:button>
 
                 <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="save">
-                    {{ __('Save changes') }}
+                    {{ __('Save') }}
                 </flux:button>
             </div>
         </form>

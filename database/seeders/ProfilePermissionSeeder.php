@@ -16,27 +16,48 @@ class ProfilePermissionSeeder extends Seeder
     {
         $map = [
             'employee' => [
-                'time-entries.read.own',
+                'time-entries.show.own',
                 'time-entries.create.own',
                 'time-entries.update.own',
                 'time-entries.delete.own',
+
+                'users.show.own',
+                'users.update.own',
+
+                'clients.show.all',
+                'activity_types.show.all',
             ],
 
-            'admin' => [
-                'users.manage',
-                'clients.manage',
-                'activity-types.manage',
-                'time-entries.read.all',
-            ],
+            'admin' => [],
 
-            'manager' => Permission::pluck('code')->toArray(), // tudo
+            'manager' => [
+                'time-entries.show.own',
+                'time-entries.create.own',
+                'time-entries.update.own',
+                'time-entries.delete.own',
+
+                'time-entries.show.all',
+
+                'users.show.own',
+                'users.show.all',
+
+                'clients.show.all',
+                'activity_types.show.all',
+            ]
         ];
 
-        foreach ($map as $profileCode => $permissions) {
-
+        foreach ($map as $profileCode => $permissionCodes) {
             $profile = Profile::where('code', $profileCode)->first();
 
-            $permissionIds = Permission::whereIn('code', $permissions)->pluck('id');
+            if (! $profile) {
+                continue;
+            }
+
+            $permissionCodes = $profileCode === 'admin'
+                ? Permission::pluck('code')->toArray()
+                : $permissionCodes;
+
+            $permissionIds = Permission::whereIn('code', $permissionCodes)->pluck('id');
 
             $profile->permissions()->sync($permissionIds);
         }

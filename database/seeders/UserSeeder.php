@@ -15,38 +15,91 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $employee = Profile::where('code', 'employee')->first();
-        $admin = Profile::where('code', 'admin')->first();
-        $manager = Profile::where('code', 'manager')->first();
-
-        User::updateOrCreate(
-            ['email' => 'employee@test.com'],
+        $employees = [
             [
-                'name' => 'Funcionário Teste',
-                'password' => Hash::make('password'),
-                'profile_id' => $employee?->id,
+                'name' => 'João Santos',
+                'email' => 'departamento.tecnologia@senilife.pt',
+                'password' => Hash::make('C4nBM,7n7[pd'),
+                'profile_code' => 'admin',
                 'is_active' => true,
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'admin@test.com'],
+            ],
             [
-                'name' => 'Admin Teste',
-                'password' => Hash::make('password'),
-                'profile_id' => $admin?->id,
+                'name' => 'Pedro Santos',
+                'email' => 'pedro.santos@senilife.pt',
+                'password' => Hash::make('!p28Xi48E\%:'),
+                'profile_code' => 'admin',
                 'is_active' => true,
-            ]
-        );
-
-        User::updateOrCreate(
-            ['email' => 'manager@test.com'],
+            ],
             [
-                'name' => 'Gestor Teste',
-                'password' => Hash::make('password'),
-                'profile_id' => $manager?->id,
+                'name' => 'Cristina Santos',
+                'email' => 'cristina.santos@senilife.pt',
+                'password' => Hash::make('4C4s-~.1"wsA'),
+                'profile_code' => 'manager',
                 'is_active' => true,
-            ]
-        );
+            ],
+            [
+                'name' => 'Flávia Espada',
+                'email' => 'flavia.espada@senilife.pt',
+                'password' => Hash::make('?U7KBl56Cs[3'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Joana Silva',
+                'email' => 'joana.silva@senilife.pt',
+                'password' => Hash::make('Yi7/9nC60~OR'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Ana Monteiro',
+                'email' => 'formacao@senilife.pt',
+                'password' => Hash::make('9Nj`9Kt2kcQ-'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Deusa Carina',
+                'email' => 'departamento.medico@senilife.pt',
+                'password' => Hash::make('Wl0yPaS5%6<:'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Maria João',
+                'email' => 'departamento.servicos@senilife.pt',
+                'password' => Hash::make('89&NjN52VRKa'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Erica Amorin',
+                'email' => 'ims@senilife.pt',
+                'password' => Hash::make('1X.0@Jy7}M-S'),
+                'profile_code' => 'employee',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Inês Azavedo',
+                'email' => 'inespaazevedo@gmail.com',
+                'password' => Hash::make('3Vr2<8\_9VBe'),
+                'profile_code' => 'manager',
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($employees as $employeeData) {
+            $profile = Profile::where('code', $employeeData['profile_code'])->first();
+
+            User::updateOrCreate(
+                ['email' => $employeeData['email']],
+                [
+                    'name' => $employeeData['name'],
+                    'password' => $employeeData['password'],
+                    'profile_id' => $profile ? $profile->id : null,
+                    'is_active' => $employeeData['is_active'],
+                ]
+            );
+        }
     }
 }

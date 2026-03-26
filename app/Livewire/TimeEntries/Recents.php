@@ -12,6 +12,8 @@ class Recents extends Component
     private const LATEST_LIMIT = 5;
 
     #[On('time-entry-created')]
+    #[On('time-entry-updated')]
+    #[On('time-entry-deleted')]
     public function refreshEntries(): void {}
 
     public function render(): View

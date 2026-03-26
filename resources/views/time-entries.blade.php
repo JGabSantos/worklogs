@@ -7,11 +7,17 @@
                         {{ __('My entries') }}
                     </flux:heading>
                     <flux:subheading>
-                        {{ __('Review, filter, and manage your time entries.') }}
+                        {{ __('Review, filter, and manage your time entries') }}
                     </flux:subheading>
                 </div>
 
-                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+                <div>
+                    <flux:modal.trigger name="time-entries.create" variant="primary">
+                        <flux:button variant="primary" icon="plus">
+                            {{ __('New entry') }}
+                        </flux:button>
+                    </flux:modal.trigger>
+
                     <livewire:time-entries.create />
                 </div>
             </div>
@@ -23,4 +29,6 @@
     </div>
 
     <livewire:time-entries.edit />
+    <livewire:time-entries.show />
+    <livewire:time-entries.delete />
 </x-layouts::app>

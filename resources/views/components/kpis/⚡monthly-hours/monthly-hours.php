@@ -9,6 +9,8 @@ use Livewire\Component;
 new class extends Component
 {
     #[On('time-entry-created')]
+    #[On('time-entry-updated')]
+    #[On('time-entry-deleted')]
     public function refreshKpi(): void {}
 
     #[Computed]

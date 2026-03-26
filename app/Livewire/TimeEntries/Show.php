@@ -2,32 +2,129 @@
 
 namespace App\Livewire\TimeEntries;
 
-use App\Models\TimeEntry;
+use App\Models\ActivityType;
+use App\Models\Client;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Show extends Component
 {
-    public int $timeEntryId;
+    public bool $showModal = false;
 
-    public TimeEntry $timeEntry;
+    public ?int $timeEntryId = null;
 
-    public function mount(int $id): void
+    public string $date = '';
+
+    public string $location = '';
+
+    public string $start_time = '';
+
+    public string $end_time = '';
+
+    public string $activity_type = '';
+    public string $activity_type_id = '';
+
+    public string $client = '';
+    public string $client_id = '';
+
+    public string $status = '';
+
+    public string $description = '';
+
+    public string $activityTypeName = '';
+
+    public string $clientName = '';
+
+    public function mount(?int $id = null): void
     {
-        $this->timeEntry = Auth::user()
+        if ($id === null) {
+            return;
+        }
+
+        if (! $this->canView()) {
+            abort(403, 'You do not have permission for this action.');
+        }
+
+        $this->fillFromEntry($id);
+        $this->showModal = true;
+    }
+
+    #[On('open-show-time-entry-modal')]
+    public function openModal(int $id): void
+    {
+        if (! $this->canView()) {
+            abort(403, 'You do not have permission for this action.');
+        }
+
+        $this->fillFromEntry($id);
+        $this->showModal = true;
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->resetFormState();
+    }
+
+    private function canView(): bool
+    {
+        $user = Auth::user();
+
+        return $user !== null && $user->hasPermission('time-entries.show.own');
+    }
+
+    private function fillFromEntry(int $id): void
+    {
+        $timeEntry = Auth::user()
             ->timeEntries()
             ->visible()
-            ->with(['activityType', 'client'])
             ->findOrFail($id);
 
-        $this->timeEntryId = $this->timeEntry->id;
+        $this->timeEntryId = $timeEntry->id;
+        $this->date = optional($timeEntry->date)->format('d/m/Y') ?? '';
+        $this->location = $timeEntry->location;
+        $this->start_time = Carbon::parse($timeEntry->start_time)->format('H:i');
+        $this->end_time = Carbon::parse($timeEntry->end_time)->format('H:i');
+        $this->activity_type = $timeEntry->activityType->name;
+        $this->activity_type_id = (string) $timeEntry->activity_type_id;
+        $this->client = $timeEntry->client->name;
+        $this->client_id = (string) $timeEntry->client_id;
+        $this->status = $timeEntry->status;
+        $this->description = $timeEntry->description;
+
+        $this->activityTypeName = ActivityType::query()
+            ->whereKey($this->activity_type_id)
+            ->value('name') ?? '';
+
+        $this->clientName = Client::query()
+            ->whereKey($this->client_id)
+            ->value('name') ?? '';
+    }
+
+    private function resetFormState(): void
+    {
+        $this->timeEntryId = null;
+        $this->date = '';
+        $this->location = '';
+        $this->start_time = '';
+        $this->end_time = '';
+        $this->activity_type = '';
+        $this->activity_type_id = '';
+        $this->client = '';
+        $this->client_id = '';
+        $this->activityTypeName = '';
+        $this->clientName = '';
+        $this->status = '';
+        $this->description = '';
     }
 
     public function render(): View
     {
         return view('livewire.time-entries.show', [
-            'timeEntry' => $this->timeEntry,
+            'canView' => $this->canView(),
         ]);
     }
 }

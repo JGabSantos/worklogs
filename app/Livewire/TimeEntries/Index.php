@@ -219,6 +219,8 @@ class Index extends Component
     // -------------------------------------------------------------------------
 
     #[On('time-entry-created')]
+    #[On('time-entry-updated')]
+    #[On('time-entry-deleted')]
     public function refreshEntries(): void
     {
         $this->resetPage();
@@ -255,8 +257,8 @@ class Index extends Component
         $query->where(function (Builder $q) use ($term) {
             $q->where('description', 'like', "%{$term}%")
                 ->orWhere('location', 'like', "%{$term}%")
-                ->orWhereHas('activityType', fn (Builder $r) => $r->where('name', 'like', "%{$term}%"))
-                ->orWhereHas('client', fn (Builder $r) => $r->where('name', 'like', "%{$term}%"));
+                ->orWhereHas('activityType', fn(Builder $r) => $r->where('name', 'like', "%{$term}%"))
+                ->orWhereHas('client', fn(Builder $r) => $r->where('name', 'like', "%{$term}%"));
         });
     }
 
@@ -338,8 +340,8 @@ class Index extends Component
 
         $query->when(
             $modelClass === ActivityType::class,
-            fn (Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
-            fn (Builder $q) => $q->orderBy('name'),
+            fn(Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
+            fn(Builder $q) => $q->orderBy('name'),
         );
 
         return $query->limit(8)->get();

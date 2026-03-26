@@ -1,12 +1,13 @@
 <?php
 
 use App\Models\TimeEntry;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
 {
-    private const DEFAULT_PERIOD  = '30d';
+    private const DEFAULT_PERIOD  = 'today';
     private const ALLOWED_PERIODS = ['today', '7d', '30d', '90d', '180d', '365d', 'all'];
     private const TOP_LIMIT       = 10;
     private const PERIOD_DAYS     = [
@@ -43,6 +44,8 @@ new class extends Component
     }
 
     #[On('time-entry-created')]
+    #[On('time-entry-updated')]
+    #[On('time-entry-deleted')]
     public function refreshChart(): void
     {
         $this->loadChart();
@@ -63,6 +66,7 @@ new class extends Component
     {
         $query = TimeEntry::query()
             ->visible()
+            ->where('user_id', Auth::id())
             ->whereNotNull('time_entries.client_id')
             ->join('clients', 'time_entries.client_id', '=', 'clients.id')
             ->selectRaw('clients.name as client_name, SUM(time_entries.duration_minutes) as total_minutes')

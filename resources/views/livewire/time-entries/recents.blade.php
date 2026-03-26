@@ -5,7 +5,7 @@
                 {{ __('Recent entries') }}
             </flux:heading>
             <flux:subheading>
-                {{ __('Your most recent time entries at a glance.') }}
+                {{ __('Your most recent time entries') }}
             </flux:subheading>
         </div>
 
@@ -17,7 +17,7 @@
     @if ($latestEntries->isEmpty())
         <div class="rounded-lg border border-dashed border-zinc-200 px-6 py-8 text-center dark:border-zinc-700">
             <flux:text class="text-zinc-500">
-                {{ __('No recent entries found.') }}
+                {{ __('No recent entries found') }}
             </flux:text>
         </div>
     @else
