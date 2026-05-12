@@ -1,6 +1,6 @@
 <flux:card class="h-full space-y-1">
     <flux:heading class="flex items-center gap-2">
-        {{ __('Weekly\'s hours') }}
+        Horas na semana
         <flux:icon name="clock" class="ml-auto h-5 w-5 text-zinc-400" />
     </flux:heading>
 
@@ -11,9 +11,9 @@
 
     <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">
         @if ($this->weeklyEntriesCount > 0)
-            {{ __(':entries entries this week', ['entries' => $this->weeklyEntriesCount]) }}
+            {{ $this->weeklyEntriesCount }} {{ $this->weeklyEntriesCount === 1 ? 'registro' : 'registros' }} esta semana
         @else
-            {{ __('No entries this week') }}
+            Nenhum registro esta semana
         @endif
     </flux:text>
 </flux:card>

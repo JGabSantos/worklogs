@@ -1,6 +1,6 @@
 <flux:card class="h-full space-y-1">
     <flux:heading class="flex items-center gap-2">
-        {{ __('Today\'s hours') }}
+        Horas hoje
         <flux:icon name="clock" class="ml-auto h-5 w-5 text-zinc-400" />
     </flux:heading>
 
@@ -11,9 +11,9 @@
 
     <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">
         @if ($this->todayEntriesCount > 0)
-            {{ __(':entries entries today', ['entries' => $this->todayEntriesCount]) }}
+            {{ $this->todayEntriesCount }} {{ $this->todayEntriesCount === 1 ? 'registro' : 'registros' }} hoje
         @else
-            {{ __('No entries today') }}
+            Nenhum registro hoje
         @endif
     </flux:text>
 </flux:card>

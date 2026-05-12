@@ -3,13 +3,13 @@
 
         <div class="flex items-end gap-4">
             <div class="flex-1">
-                <flux:input wire:model.live.debounce.300ms="search" label="{{ __('Search') }}"
-                    placeholder="{{ __('ex.: Client, type or description') }}" clearable class="max-w-md" />
+                <flux:input wire:model.live.debounce.300ms="search" label="Pesquisar"
+                    placeholder="ex.: Cliente, tipo ou descrição" clearable class="max-w-md" />
             </div>
 
             <button type="button" x-on:click="isAdvancedOpen = !isAdvancedOpen"
                 x-bind:aria-expanded="isAdvancedOpen.toString()" aria-controls="advanced-filters"
-                aria-label="{{ __('Toggle advanced filters') }}"
+                aria-label="Alternar filtros avançados"
                 class="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border transition
                        border-zinc-200 text-zinc-600 hover:bg-zinc-100
                        dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
@@ -32,29 +32,33 @@
             x-transition:leave-end="opacity-0 -translate-y-1" x-cloak>
             <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
 
-                <flux:select wire:model.live="status" label="{{ __('Status') }}">
-                    <flux:select.option value="">{{ __('All') }}</flux:select.option>
-                    <flux:select.option value="draft">{{ __('Draft') }}</flux:select.option>
-                    <flux:select.option value="active">{{ __('Active') }}</flux:select.option>
+                <flux:select wire:model.live="status" label="Status">
+                    <flux:select.option value="">Todos</flux:select.option>
+                    <flux:select.option value="draft">Rascunho</flux:select.option>
+                    <flux:select.option value="active">Ativo</flux:select.option>
                 </flux:select>
 
-                <x-autocomplete fieldLabel="{{ __('Client') }}" placeholder="{{ __('Search client') }}"
-                    alpineOpenVar="isClientOpen" wireModel="clientSearch" :suggestions="$clientSuggestions" :selectedId="$client_id"
-                    selectAction="selectClient" clearAction="clearClientSelection"
-                    emptyMessage="{{ __('No clients found.') }}" />
+                <flux:select wire:model.live="client_id" label="Cliente">
+                    <flux:select.option value="">Todos os clientes</flux:select.option>
+                    @foreach ($clients as $client)
+                        <flux:select.option :value="$client->id">{{ $client->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
 
-                <x-autocomplete fieldLabel="{{ __('Activity type') }}" placeholder="{{ __('Search activity type') }}"
-                    alpineOpenVar="isActivityTypeOpen" wireModel="activityTypeSearch" :suggestions="$activityTypeSuggestions"
-                    :selectedId="$activity_type_id" selectAction="selectActivityType" clearAction="clearActivityTypeSelection"
-                    emptyMessage="{{ __('No activity types found.') }}" />
+                <flux:select wire:model.live="activity_type_id" label="Tipo de atividade">
+                    <flux:select.option value="">Todos os tipos</flux:select.option>
+                    @foreach ($activityTypes as $activityType)
+                        <flux:select.option :value="$activityType->id">{{ $activityType->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
 
-                <flux:input wire:model.live="dateFromInput" label="{{ __('Start date') }}" placeholder="dd/mm/yyyy" />
+                <flux:input wire:model.live="dateFromInput" label="Data inicial" placeholder="dd/mm/aaaa" />
 
-                <flux:input wire:model.live="dateToInput" label="{{ __('End date') }}" placeholder="dd/mm/yyyy" />
+                <flux:input wire:model.live="dateToInput" label="Data final" placeholder="dd/mm/aaaa" />
 
                 <div class="flex items-end">
                     <flux:button wire:click="clearFilters" variant="ghost" class="w-full">
-                        {{ __('Clear filters') }}
+                        Limpar filtros
                     </flux:button>
                 </div>
 
@@ -65,31 +69,31 @@
     <flux:card>
 
         <div wire:loading.delay class="mb-3">
-            <flux:text class="text-zinc-500">{{ __('Loading...') }}</flux:text>
+            <flux:text class="text-zinc-500">Carregando...</flux:text>
         </div>
 
         @if ($timeEntries->isEmpty())
             <div class="rounded-lg border border-dashed border-zinc-200 px-6 py-10 text-center dark:border-zinc-700">
                 <flux:text class="text-zinc-500">
-                    {{ __('Nothing found for the applied filters.') }}
+                    Nenhum resultado para os filtros aplicados.
                 </flux:text>
             </div>
         @else
             <flux:table :paginate="$timeEntries">
                 <flux:table.columns>
                     <flux:table.column sortable :sorted="$sortBy === 'date'" :direction="$orderBy"
-                        wire:click="sort('date')">{{ __('Date') }}</flux:table.column>
+                        wire:click="sort('date')">Data</flux:table.column>
 
-                    <flux:table.column>{{ __('Start time') }}</flux:table.column>
-                    <flux:table.column>{{ __('End time') }}</flux:table.column>
+                    <flux:table.column>Hora início</flux:table.column>
+                    <flux:table.column>Hora fim</flux:table.column>
 
                     <flux:table.column sortable :sorted="$sortBy === 'duration_minutes'" :direction="$orderBy"
-                        wire:click="sort('duration_minutes')">{{ __('Duration') }}</flux:table.column>
+                        wire:click="sort('duration_minutes')">Duração</flux:table.column>
 
-                    <flux:table.column>{{ __('Type') }}</flux:table.column>
-                    <flux:table.column>{{ __('Client') }}</flux:table.column>
-                    <flux:table.column>{{ __('Location') }}</flux:table.column>
-                    <flux:table.column>{{ __('Status') }}</flux:table.column>
+                    <flux:table.column>Tipo</flux:table.column>
+                    <flux:table.column>Cliente</flux:table.column>
+                    <flux:table.column>Local</flux:table.column>
+                    <flux:table.column>Status</flux:table.column>
                     <flux:table.column></flux:table.column>
                 </flux:table.columns>
 
@@ -100,7 +104,7 @@
                             <flux:table.cell>{{ $entry->start_time->format('H:i') }}</flux:table.cell>
                             <flux:table.cell>{{ $entry->end_time->format('H:i') }}</flux:table.cell>
                             <flux:table.cell>{{ $entry->duration_minutes }} min</flux:table.cell>
-                            <flux:table.cell>{{ __($entry->activityType->name) }}</flux:table.cell>
+                            <flux:table.cell>{{ $entry->activityType->name }}</flux:table.cell>
                             <flux:table.cell>{{ $entry->client->name }}</flux:table.cell>
                             <flux:table.cell>{{ $entry->location }}</flux:table.cell>
 
@@ -110,21 +114,21 @@
 
                             <flux:table.cell class="text-right">
                                 <flux:dropdown>
-                                    <flux:button icon:trailing="chevron-down">{{ __('Actions') }}</flux:button>
+                                    <flux:button icon:trailing="chevron-down">Ações</flux:button>
 
                                     <flux:menu>
                                         <flux:menu.item
                                             wire:click="$dispatch('open-show-time-entry-modal', { id: {{ $entry->id }} })">
-                                            {{ __('Show') }}
+                                            Visualizar
                                         </flux:menu.item>
                                         <flux:menu.item
                                             wire:click="$dispatch('open-edit-time-entry-modal', { id: {{ $entry->id }} })">
-                                            {{ __('Edit') }}
+                                            Editar
                                         </flux:menu.item>
                                         <flux:menu.separator />
                                         <flux:menu.item variant="danger"
                                             wire:click="$dispatch('open-delete-time-entry-modal', { id: {{ $entry->id }} })">
-                                            {{ __('Delete') }}
+                                            Excluir
                                         </flux:menu.item>
                                     </flux:menu>
                                 </flux:dropdown>

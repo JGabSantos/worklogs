@@ -72,5 +72,5 @@ test('daily hours kpi shows only todays visible entries', function () {
 
     Livewire::test('kpis.daily-hours')
         ->assertSee('2:15')
-        ->assertSee('1 entries today');
+        ->assertSee('1 registro hoje');
 });

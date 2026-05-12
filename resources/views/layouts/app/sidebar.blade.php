@@ -14,15 +14,15 @@
         </flux:sidebar.header>
 
         <flux:sidebar.nav>
-            <flux:sidebar.group :heading="__('Platform')" class="grid">
+            <flux:sidebar.group heading="Plataforma" class="grid">
                 <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>
-                    {{ __('Dashboard') }}
+                    Dashboard
                 </flux:sidebar.item>
 
                 <flux:sidebar.item icon="clock" :href="route('time-entries.index')"
                     :current="request()->routeIs('time-entries.index')" wire:navigate>
-                    {{ __('Time Entries') }}
+                    Registros de horas
                 </flux:sidebar.item>
             </flux:sidebar.group>
         </flux:sidebar.nav>
@@ -59,7 +59,7 @@
 
                 <flux:menu.radio.group>
                     <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                        {{ __('Settings') }}
+                        Configurações
                     </flux:menu.item>
                 </flux:menu.radio.group>
 
@@ -69,7 +69,7 @@
                     @csrf
                     <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
                         class="w-full cursor-pointer" data-test="logout-button">
-                        {{ __('Log out') }}
+                        Sair
                     </flux:menu.item>
                 </form>
             </flux:menu>

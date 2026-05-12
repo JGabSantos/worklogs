@@ -1,23 +1,17 @@
-<x-layouts::app :title="__('Dashboard')">
+<x-layouts::app title="Registros de horas">
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <div class="space-y-8">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div class="space-y-1">
                     <flux:heading size="xl">
-                        {{ __('My entries') }}
+                        Meus registros
                     </flux:heading>
                     <flux:subheading>
-                        {{ __('Review, filter, and manage your time entries') }}
+                        Visualize, filtre e gerencie seus registros de horas
                     </flux:subheading>
                 </div>
 
                 <div>
-                    <flux:modal.trigger name="time-entries.create" variant="primary">
-                        <flux:button variant="primary" icon="plus">
-                            {{ __('New entry') }}
-                        </flux:button>
-                    </flux:modal.trigger>
-
                     <livewire:time-entries.create />
                 </div>
             </div>

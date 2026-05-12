@@ -2,8 +2,6 @@
 
 namespace App\Livewire\TimeEntries;
 
-use App\Models\ActivityType;
-use App\Models\Client;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -25,18 +23,16 @@ class Show extends Component
     public string $end_time = '';
 
     public string $activity_type = '';
+
     public string $activity_type_id = '';
 
     public string $client = '';
+
     public string $client_id = '';
 
     public string $status = '';
 
     public string $description = '';
-
-    public string $activityTypeName = '';
-
-    public string $clientName = '';
 
     public function mount(?int $id = null): void
     {
@@ -95,13 +91,6 @@ class Show extends Component
         $this->status = $timeEntry->status;
         $this->description = $timeEntry->description;
 
-        $this->activityTypeName = ActivityType::query()
-            ->whereKey($this->activity_type_id)
-            ->value('name') ?? '';
-
-        $this->clientName = Client::query()
-            ->whereKey($this->client_id)
-            ->value('name') ?? '';
     }
 
     private function resetFormState(): void
@@ -115,8 +104,6 @@ class Show extends Component
         $this->activity_type_id = '';
         $this->client = '';
         $this->client_id = '';
-        $this->activityTypeName = '';
-        $this->clientName = '';
         $this->status = '';
         $this->description = '';
     }

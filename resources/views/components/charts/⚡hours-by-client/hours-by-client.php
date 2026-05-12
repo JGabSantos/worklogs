@@ -85,7 +85,7 @@ new class extends Component
             ->toArray();
 
         if ($others > 0) {
-            $categories[] = __('Others');
+            $categories[] = 'Outros';
             $series[]     = (int) $others;
         }
 

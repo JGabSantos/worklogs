@@ -57,5 +57,5 @@ test('weekly hours kpi uses the current week boundaries', function () {
 
     Livewire::test('kpis.weekly-hours')
         ->assertSee('2:00')
-        ->assertSee('1 entries this week');
+        ->assertSee('1 registro esta semana');
 });

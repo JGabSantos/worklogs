@@ -8,8 +8,6 @@ use App\Models\TimeEntry;
 use App\Services\TimeEntryService;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -30,17 +28,17 @@ class Edit extends Component
 
     public string $activity_type_id = '';
 
-    public string $activityTypeSearch = '';
-
     public string $client_id = '';
-
-    public string $clientSearch = '';
 
     public string $status = 'draft';
 
     public string $description = '';
 
     public ?string $errorMessage = null;
+
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
 
     public function mount(?int $id = null): void
     {
@@ -53,10 +51,32 @@ class Edit extends Component
         }
 
         $this->fillFromEntry($id);
-        $this->syncSelectedAutocompleteLabel('client_id', 'clientSearch', Client::class);
-        $this->syncSelectedAutocompleteLabel('activity_type_id', 'activityTypeSearch', ActivityType::class);
         $this->showModal = true;
     }
+
+    // -------------------------------------------------------------------------
+    // Render
+    // -------------------------------------------------------------------------
+
+    public function render(): View
+    {
+        return view('livewire.time-entries.edit', [
+            'canUpdate' => $this->canUpdate(),
+            'activityTypes' => ActivityType::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get(),
+            'clients' => Client::query()
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(),
+        ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Modal actions
+    // -------------------------------------------------------------------------
 
     #[On('open-edit-time-entry-modal')]
     public function openModal(int $id): void
@@ -66,8 +86,6 @@ class Edit extends Component
         }
 
         $this->fillFromEntry($id);
-        $this->syncSelectedAutocompleteLabel('client_id', 'clientSearch', Client::class);
-        $this->syncSelectedAutocompleteLabel('activity_type_id', 'activityTypeSearch', ActivityType::class);
         $this->showModal = true;
         $this->errorMessage = null;
     }
@@ -78,6 +96,44 @@ class Edit extends Component
         $this->resetFormState();
         $this->resetValidation();
     }
+
+    // -------------------------------------------------------------------------
+    // Save
+    // -------------------------------------------------------------------------
+
+    public function save(TimeEntryService $timeEntryService): void
+    {
+        $this->errorMessage = null;
+
+        if (! $this->canUpdate()) {
+            abort(403, 'You do not have permission for this action.');
+        }
+
+        $timeEntry = $this->resolveEditableTimeEntry();
+        $validated = $this->validate();
+
+        try {
+            $timeEntryService->update($timeEntry, [
+                ...$validated,
+                'date' => Carbon::createFromFormat('d/m/Y', $validated['date'])->toDateString(),
+                'start_time' => $validated['start_time'].':00',
+                'end_time' => $validated['end_time'].':00',
+            ], Auth::user());
+
+            session()->flash('success', 'Registro atualizado com sucesso.');
+
+            $this->showModal = false;
+            $this->resetFormState();
+
+            $this->dispatch('time-entry-updated')->to(Index::class);
+        } catch (\Exception $exception) {
+            $this->errorMessage = $exception->getMessage();
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Validation
+    // -------------------------------------------------------------------------
 
     protected function rules(): array
     {
@@ -96,41 +152,15 @@ class Edit extends Component
     protected function messages(): array
     {
         return [
-            'date.date_format' => 'The date must be in the dd/mm/yyyy format.',
-            'start_time.date_format' => 'The start time must be in the hh:mm format.',
-            'end_time.date_format' => 'The end time must be in the hh:mm format.',
+            'date.date_format' => 'A data deve estar no formato dd/mm/aaaa.',
+            'start_time.date_format' => 'A hora de início deve estar no formato hh:mm.',
+            'end_time.date_format' => 'A hora de fim deve estar no formato hh:mm.',
         ];
     }
 
-    public function save(TimeEntryService $timeEntryService): void
-    {
-        $this->errorMessage = null;
-
-        if (! $this->canUpdate()) {
-            abort(403, 'You do not have permission for this action.');
-        }
-
-        $timeEntry = $this->resolveEditableTimeEntry();
-        $validated = $this->validate();
-
-        try {
-            $timeEntryService->update($timeEntry, [
-                ...$validated,
-                'date' => Carbon::createFromFormat('d/m/Y', $validated['date'])->toDateString(),
-                'start_time' => $validated['start_time'] . ':00',
-                'end_time' => $validated['end_time'] . ':00',
-            ], Auth::user());
-
-            session()->flash('success', 'Entry updated successfully.');
-
-            $this->showModal = false;
-            $this->resetFormState();
-
-            $this->dispatch('time-entry-created')->to(Index::class);
-        } catch (\Exception $exception) {
-            $this->errorMessage = $exception->getMessage();
-        }
-    }
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
 
     private function canUpdate(): bool
     {
@@ -176,160 +206,8 @@ class Edit extends Component
         $this->end_time = '';
         $this->activity_type_id = '';
         $this->client_id = '';
-        $this->activityTypeSearch = '';
-        $this->clientSearch = '';
         $this->status = 'draft';
         $this->description = '';
         $this->errorMessage = null;
-    }
-
-    // -------------------------------------------------------------------------
-    // Autocomplete watchers & actions
-    // -------------------------------------------------------------------------
-
-    public function updatedClientSearch(string $value): void
-    {
-        $this->syncAutocompleteSearch($value, 'client_id', 'clientSearch', Client::class);
-    }
-
-    public function updatedActivityTypeSearch(string $value): void
-    {
-        $this->syncAutocompleteSearch($value, 'activity_type_id', 'activityTypeSearch', ActivityType::class);
-    }
-
-    public function updatedClientId(): void
-    {
-        $this->syncSelectedAutocompleteLabel('client_id', 'clientSearch', Client::class);
-    }
-
-    public function updatedActivityTypeId(): void
-    {
-        $this->syncSelectedAutocompleteLabel('activity_type_id', 'activityTypeSearch', ActivityType::class);
-    }
-
-    public function selectClient(string $clientId): void
-    {
-        $this->setAutocompleteSelection('client_id', 'clientSearch', Client::class, $clientId);
-    }
-
-    public function clearClientSelection(): void
-    {
-        $this->clearAutocompleteSelection('client_id', 'clientSearch');
-    }
-
-    public function selectActivityType(string $activityTypeId): void
-    {
-        $this->setAutocompleteSelection('activity_type_id', 'activityTypeSearch', ActivityType::class, $activityTypeId);
-    }
-
-    public function clearActivityTypeSelection(): void
-    {
-        $this->clearAutocompleteSelection('activity_type_id', 'activityTypeSearch');
-    }
-
-    // -------------------------------------------------------------------------
-    // Autocomplete helpers
-    // -------------------------------------------------------------------------
-
-    private function getAutocompleteSuggestions(string $modelClass, string $searchTerm): Collection
-    {
-        $term = trim($searchTerm);
-
-        $query = $modelClass::query()->where('is_active', true);
-
-        if ($term !== '') {
-            foreach (explode(' ', $term) as $word) {
-                $query->where('name', 'like', "%{$word}%");
-            }
-        }
-
-        $query->when(
-            $modelClass === ActivityType::class,
-            fn(Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
-            fn(Builder $q) => $q->orderBy('name'),
-        );
-
-        return $query->limit(8)->get();
-    }
-
-    private function syncAutocompleteSearch(string $value, string $idProperty, string $searchProperty, string $modelClass): void
-    {
-        $value = trim($value);
-        $this->{$searchProperty} = $value;
-
-        if ($value === '') {
-            $this->{$idProperty} = '';
-
-            return;
-        }
-
-        $label = $this->resolveAutocompleteLabel($modelClass, $this->{$idProperty});
-
-        if ($label === null || strcasecmp($label, $value) !== 0) {
-            $this->{$idProperty} = '';
-        }
-    }
-
-    private function syncSelectedAutocompleteLabel(string $idProperty, string $searchProperty, string $modelClass): void
-    {
-        $label = $this->resolveAutocompleteLabel($modelClass, $this->{$idProperty});
-
-        if ($label === null) {
-            $this->{$idProperty} = '';
-            $this->{$searchProperty} = '';
-
-            return;
-        }
-
-        $this->{$searchProperty} = $label;
-    }
-
-    private function setAutocompleteSelection(string $idProperty, string $searchProperty, string $modelClass, string $selectedId): void
-    {
-        $label = $this->resolveAutocompleteLabel($modelClass, $selectedId);
-
-        if ($label === null) {
-            $this->clearAutocompleteSelection($idProperty, $searchProperty);
-
-            return;
-        }
-
-        $this->{$idProperty} = $selectedId;
-        $this->{$searchProperty} = $label;
-    }
-
-    private function clearAutocompleteSelection(string $idProperty, string $searchProperty): void
-    {
-        $this->{$idProperty} = '';
-        $this->{$searchProperty} = '';
-    }
-
-    private function resolveAutocompleteLabel(string $modelClass, string $selectedId): ?string
-    {
-        if ($selectedId === '') {
-            return null;
-        }
-
-        return $modelClass::query()
-            ->whereKey($selectedId)
-            ->where('is_active', true)
-            ->value('name');
-    }
-
-    public function render(): View
-    {
-        return view('livewire.time-entries.edit', [
-            'canUpdate' => $this->canUpdate(),
-            'activityTypes' => ActivityType::query()
-                ->where('is_active', true)
-                ->orderBy('sort_order')
-                ->get(),
-            'clients' => Client::query()
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get(),
-            'activityTypeSuggestions' => $this->getAutocompleteSuggestions(ActivityType::class, $this->activityTypeSearch),
-            'clientSuggestions' => $this->getAutocompleteSuggestions(Client::class, $this->clientSearch),
-        ]);
     }
 }

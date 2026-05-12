@@ -50,8 +50,6 @@ test('edit component loads the selected entry for an authorized user', function 
         ->assertSet('end_time', '10:45')
         ->assertSet('activity_type_id', (string) $activityType->id)
         ->assertSet('client_id', (string) $client->id)
-        ->assertSet('activityTypeSearch', $activityType->name)
-        ->assertSet('clientSearch', $client->name)
         ->assertSet('description', 'Sprint review');
 });
 
@@ -108,7 +106,7 @@ test('editing a time entry persists the changes and dispatches refresh event', f
         ->set('status', 'active')
         ->call('save')
         ->assertHasNoErrors()
-        ->assertDispatched('time-entry-created')
+        ->assertDispatched('time-entry-updated')
         ->assertSet('showModal', false)
         ->assertSet('timeEntryId', null);
 

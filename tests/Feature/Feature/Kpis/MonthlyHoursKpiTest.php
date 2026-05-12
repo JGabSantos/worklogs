@@ -57,5 +57,5 @@ test('monthly hours kpi excludes entries from previous months', function () {
 
     Livewire::test('kpis.monthly-hours')
         ->assertSee('2:30')
-        ->assertSee('1 entries this month');
+        ->assertSee('1 registro este mês');
 });

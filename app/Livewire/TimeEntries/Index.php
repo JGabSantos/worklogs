@@ -8,13 +8,11 @@ use App\Models\TimeEntry;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-
 
 class Index extends Component
 {
@@ -51,12 +49,8 @@ class Index extends Component
     #[Url(as: 'client_id', except: '')]
     public string $client_id = '';
 
-    public string $clientSearch = '';
-
     #[Url(as: 'activity_type_id', except: '')]
     public string $activity_type_id = '';
-
-    public string $activityTypeSearch = '';
 
     #[Url(as: 'duration_min', except: '')]
     public string $duration_min = '';
@@ -81,14 +75,17 @@ class Index extends Component
     {
         $this->normalizeDateFilter('dateFrom', 'dateFromInput');
         $this->normalizeDateFilter('dateTo', 'dateToInput');
-        $this->syncSelectedAutocompleteLabel('client_id', 'clientSearch', Client::class);
-        $this->syncSelectedAutocompleteLabel('activity_type_id', 'activityTypeSearch', ActivityType::class);
+        $this->sanitizeRelationFilter('client_id', Client::class);
+        $this->sanitizeRelationFilter('activity_type_id', ActivityType::class);
         $this->sanitizeSortAndPagination();
     }
 
     public function updated(string $property): void
     {
-        $resetsPage = ['search', 'status', 'duration_min', 'duration_max', 'sort_by', 'perPage'];
+        $resetsPage = [
+            'search', 'status', 'client_id', 'activity_type_id',
+            'duration_min', 'duration_max', 'sort_by', 'perPage',
+        ];
 
         if (in_array($property, $resetsPage, strict: true)) {
             if ($property === 'perPage') {
@@ -109,8 +106,8 @@ class Index extends Component
             'timeEntries' => $this->buildQuery()->paginate($this->perPage),
             'sortBy' => $this->sort_by,
             'orderBy' => $this->orderBy,
-            'clientSuggestions' => $this->getAutocompleteSuggestions(Client::class, $this->clientSearch),
-            'activityTypeSuggestions' => $this->getAutocompleteSuggestions(ActivityType::class, $this->activityTypeSearch),
+            'clients' => Client::query()->where('is_active', true)->orderBy('name')->get(),
+            'activityTypes' => ActivityType::query()->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get(),
             'hasAdvancedFiltersActive' => $this->hasAdvancedFiltersActive(),
         ]);
     }
@@ -143,9 +140,7 @@ class Index extends Component
         $this->dateToInput = '';
         $this->status = '';
         $this->client_id = '';
-        $this->clientSearch = '';
         $this->activity_type_id = '';
-        $this->activityTypeSearch = '';
         $this->duration_min = '';
         $this->duration_max = '';
         $this->sort_by = self::DEFAULT_SORT_BY;
@@ -167,52 +162,6 @@ class Index extends Component
     public function updatedDateToInput(string $value): void
     {
         $this->syncDateFilter($value, 'dateTo');
-    }
-
-    // -------------------------------------------------------------------------
-    // Autocomplete watchers & actions
-    // -------------------------------------------------------------------------
-
-    public function updatedClientSearch(string $value): void
-    {
-        $this->syncAutocompleteSearch($value, 'client_id', 'clientSearch', Client::class);
-    }
-
-    public function updatedActivityTypeSearch(string $value): void
-    {
-        $this->syncAutocompleteSearch($value, 'activity_type_id', 'activityTypeSearch', ActivityType::class);
-    }
-
-    public function updatedClientId(): void
-    {
-        $this->syncSelectedAutocompleteLabel('client_id', 'clientSearch', Client::class);
-        $this->resetPage();
-    }
-
-    public function updatedActivityTypeId(): void
-    {
-        $this->syncSelectedAutocompleteLabel('activity_type_id', 'activityTypeSearch', ActivityType::class);
-        $this->resetPage();
-    }
-
-    public function selectClient(string $clientId): void
-    {
-        $this->setAutocompleteSelection('client_id', 'clientSearch', Client::class, $clientId);
-    }
-
-    public function clearClientSelection(): void
-    {
-        $this->clearAutocompleteSelection('client_id', 'clientSearch');
-    }
-
-    public function selectActivityType(string $activityTypeId): void
-    {
-        $this->setAutocompleteSelection('activity_type_id', 'activityTypeSearch', ActivityType::class, $activityTypeId);
-    }
-
-    public function clearActivityTypeSelection(): void
-    {
-        $this->clearAutocompleteSelection('activity_type_id', 'activityTypeSearch');
     }
 
     // -------------------------------------------------------------------------
@@ -257,8 +206,8 @@ class Index extends Component
         $query->where(function (Builder $q) use ($term) {
             $q->where('description', 'like', "%{$term}%")
                 ->orWhere('location', 'like', "%{$term}%")
-                ->orWhereHas('activityType', fn(Builder $r) => $r->where('name', 'like', "%{$term}%"))
-                ->orWhereHas('client', fn(Builder $r) => $r->where('name', 'like', "%{$term}%"));
+                ->orWhereHas('activityType', fn (Builder $r) => $r->where('name', 'like', "%{$term}%"))
+                ->orWhereHas('client', fn (Builder $r) => $r->where('name', 'like', "%{$term}%"));
         });
     }
 
@@ -323,100 +272,6 @@ class Index extends Component
     }
 
     // -------------------------------------------------------------------------
-    // Private — autocomplete helpers
-    // -------------------------------------------------------------------------
-
-    private function getAutocompleteSuggestions(string $modelClass, string $searchTerm): Collection
-    {
-        $term = trim($searchTerm);
-
-        $query = $modelClass::query()->where('is_active', true);
-
-        if ($term !== '') {
-            foreach (explode(' ', $term) as $word) {
-                $query->where('name', 'like', "%{$word}%");
-            }
-        }
-
-        $query->when(
-            $modelClass === ActivityType::class,
-            fn(Builder $q) => $q->orderBy('sort_order')->orderBy('name'),
-            fn(Builder $q) => $q->orderBy('name'),
-        );
-
-        return $query->limit(8)->get();
-    }
-
-    private function syncAutocompleteSearch(string $value, string $idProperty, string $searchProperty, string $modelClass): void
-    {
-        $value = trim($value);
-        $this->{$searchProperty} = $value;
-
-        if ($value === '') {
-            $this->{$idProperty} = '';
-            $this->resetPage();
-
-            return;
-        }
-
-        $label = $this->resolveAutocompleteLabel($modelClass, $this->{$idProperty});
-
-        if ($label === null || strcasecmp($label, $value) !== 0) {
-            $this->{$idProperty} = '';
-        }
-
-        $this->resetPage();
-    }
-
-    private function syncSelectedAutocompleteLabel(string $idProperty, string $searchProperty, string $modelClass): void
-    {
-        $label = $this->resolveAutocompleteLabel($modelClass, $this->{$idProperty});
-
-        if ($label === null) {
-            $this->{$idProperty} = '';
-            $this->{$searchProperty} = '';
-
-            return;
-        }
-
-        $this->{$searchProperty} = $label;
-    }
-
-    private function setAutocompleteSelection(string $idProperty, string $searchProperty, string $modelClass, string $selectedId): void
-    {
-        $label = $this->resolveAutocompleteLabel($modelClass, $selectedId);
-
-        if ($label === null) {
-            $this->clearAutocompleteSelection($idProperty, $searchProperty);
-
-            return;
-        }
-
-        $this->{$idProperty} = $selectedId;
-        $this->{$searchProperty} = $label;
-        $this->resetPage();
-    }
-
-    private function clearAutocompleteSelection(string $idProperty, string $searchProperty): void
-    {
-        $this->{$idProperty} = '';
-        $this->{$searchProperty} = '';
-        $this->resetPage();
-    }
-
-    private function resolveAutocompleteLabel(string $modelClass, string $selectedId): ?string
-    {
-        if ($selectedId === '') {
-            return null;
-        }
-
-        return $modelClass::query()
-            ->whereKey($selectedId)
-            ->where('is_active', true)
-            ->value('name');
-    }
-
-    // -------------------------------------------------------------------------
     // Private — date helpers
     // -------------------------------------------------------------------------
 
@@ -472,6 +327,21 @@ class Index extends Component
     // -------------------------------------------------------------------------
     // Private — misc helpers
     // -------------------------------------------------------------------------
+
+    private function sanitizeRelationFilter(string $idProperty, string $modelClass): void
+    {
+        $id = $this->{$idProperty};
+
+        if ($id === '') {
+            return;
+        }
+
+        $exists = $modelClass::query()->whereKey($id)->where('is_active', true)->exists();
+
+        if (! $exists) {
+            $this->{$idProperty} = '';
+        }
+    }
 
     private function sanitizeSortAndPagination(): void
     {

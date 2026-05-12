@@ -56,7 +56,7 @@ new class extends Component {
             $this->qrCodeSvg = $user->twoFactorQrCodeSvg();
             $this->manualSetupKey = decrypt($user->two_factor_secret);
         } catch (Exception) {
-            $this->addError('setupData', 'Failed to fetch setup data.');
+            $this->addError('setupData', 'Falha ao obter os dados de configuração.');
 
             $this->reset('qrCodeSvg', 'manualSetupKey');
         }
@@ -128,24 +128,24 @@ new class extends Component {
     {
         if ($this->setupComplete) {
             return [
-                'title' => __('Two-factor authentication enabled'),
-                'description' => __('Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.'),
-                'buttonText' => __('Close'),
+                'title' => 'Autenticação de dois fatores ativada',
+                'description' => 'A autenticação de dois fatores está ativa. Leia o QR code ou insira a chave de configuração no seu aplicativo autenticador.',
+                'buttonText' => 'Fechar',
             ];
         }
 
         if ($this->showVerificationStep) {
             return [
-                'title' => __('Verify authentication code'),
-                'description' => __('Enter the 6-digit code from your authenticator app.'),
-                'buttonText' => __('Continue'),
+                'title' => 'Verificar código de autenticação',
+                'description' => 'Digite o código de 6 dígitos do seu aplicativo autenticador.',
+                'buttonText' => 'Continuar',
             ];
         }
 
         return [
-            'title' => __('Enable two-factor authentication'),
-            'description' => __('To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app.'),
-            'buttonText' => __('Continue'),
+            'title' => 'Ativar autenticação de dois fatores',
+            'description' => 'Para concluir a ativação, leia o QR code ou insira a chave de configuração no seu aplicativo autenticador.',
+            'buttonText' => 'Continuar',
         ];
     }
 }; ?>
@@ -188,7 +188,7 @@ new class extends Component {
                             name="code"
                             wire:model="code"
                             length="6"
-                            label="OTP Code"
+                            label="Código OTP"
                             label:sr-only
                             class="mx-auto"
                         />
@@ -200,7 +200,7 @@ new class extends Component {
                             class="flex-1"
                             wire:click="resetVerification"
                         >
-                            {{ __('Back') }}
+                            Voltar
                         </flux:button>
 
                         <flux:button
@@ -209,7 +209,7 @@ new class extends Component {
                             wire:click="confirmTwoFactor"
                             x-bind:disabled="$wire.code.length < 6"
                         >
-                            {{ __('Confirm') }}
+                            Confirmar
                         </flux:button>
                     </div>
                 </div>
@@ -252,7 +252,7 @@ new class extends Component {
                     <div class="relative flex items-center justify-center w-full">
                         <div class="absolute inset-0 w-full h-px top-1/2 bg-stone-200 dark:bg-stone-600"></div>
                         <span class="relative px-2 text-sm bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400">
-                            {{ __('or, enter the code manually') }}
+                            ou, insira o código manualmente
                         </span>
                     </div>
 

@@ -1,18 +1,18 @@
 <flux:card class="min-w-0 overflow-hidden">
     <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-            <flux:heading size="md">{{ __('Hours by client') }}</flux:heading>
-            <flux:subheading class="text-sm">{{ __('Time spent per client') }}</flux:subheading>
+            <flux:heading size="md">Horas por cliente</flux:heading>
+            <flux:subheading class="text-sm">Tempo gasto por cliente</flux:subheading>
         </div>
 
         <flux:select wire:model.live="period" class="w-full shrink-0 text-sm sm:w-36">
-            <flux:select.option value="today">{{ __('Today') }}</flux:select.option>
-            <flux:select.option value="7d">{{ __('7 days') }}</flux:select.option>
-            <flux:select.option value="30d">{{ __('30 days') }}</flux:select.option>
-            <flux:select.option value="90d">{{ __('90 days') }}</flux:select.option>
-            <flux:select.option value="180d">{{ __('180 days') }}</flux:select.option>
-            <flux:select.option value="365d">{{ __('365 days') }}</flux:select.option>
-            <flux:select.option value="all">{{ __('All time') }}</flux:select.option>
+            <flux:select.option value="today">Hoje</flux:select.option>
+            <flux:select.option value="7d">7 dias</flux:select.option>
+            <flux:select.option value="30d">30 dias</flux:select.option>
+            <flux:select.option value="90d">90 dias</flux:select.option>
+            <flux:select.option value="180d">180 dias</flux:select.option>
+            <flux:select.option value="365d">365 dias</flux:select.option>
+            <flux:select.option value="all">Todo o período</flux:select.option>
         </flux:select>
     </div>
 
@@ -24,7 +24,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-                <p class="text-sm text-zinc-400">{{ __('No data for this period') }}</p>
+                <p class="text-sm text-zinc-400">Sem dados para este período</p>
             </div>
         @else
             <div id="time-by-client-chart-{{ $this->getId() }}" class="w-full min-w-[20rem] sm:min-w-0" wire:ignore>
@@ -172,7 +172,7 @@
                         mode: t.mode
                     },
                     series: [{
-                        name: '{{ __('Hours') }}',
+                        name: 'Horas',
                         data: series
                     }],
                     colors: generatePalette(series.length),

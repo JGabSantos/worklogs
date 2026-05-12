@@ -2,8 +2,8 @@
 
 namespace App\Livewire\TimeEntries;
 
-use App\Services\TimeEntryService;
 use App\Models\TimeEntry;
+use App\Services\TimeEntryService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
@@ -11,7 +11,7 @@ use Livewire\Component;
 
 class Delete extends Component
 {
-    private const DEFAULT_BUTTON_LABEL = 'Delete';
+    private const DEFAULT_BUTTON_LABEL = 'Excluir';
 
     private const DEFAULT_BUTTON_VARIANT = 'danger';
 
@@ -88,7 +88,7 @@ class Delete extends Component
         try {
             $timeEntryService->delete($timeEntry, Auth::user());
 
-            session()->flash('success', 'Entry deleted successfully.');
+            session()->flash('success', 'Registro excluído com sucesso.');
 
             $this->resetState();
             $this->closeModal();

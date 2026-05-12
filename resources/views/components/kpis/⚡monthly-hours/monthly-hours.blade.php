@@ -1,6 +1,6 @@
 <flux:card class="h-full space-y-1">
     <flux:heading class="flex items-center gap-2">
-        {{ __('Monthly\'s hours') }}
+        Horas no mês
         <flux:icon name="clock" class="ml-auto h-5 w-5 text-zinc-400" />
     </flux:heading>
 
@@ -11,9 +11,9 @@
 
     <flux:text size="sm" class="text-zinc-500 dark:text-zinc-400">
         @if ($this->monthlyEntriesCount > 0)
-            {{ __(':entries entries this month', ['entries' => $this->monthlyEntriesCount]) }}
+            {{ $this->monthlyEntriesCount }} {{ $this->monthlyEntriesCount === 1 ? 'registro' : 'registros' }} este mês
         @else
-            {{ __('No entries this month') }}
+            Nenhum registro este mês
         @endif
     </flux:text>
 </flux:card>

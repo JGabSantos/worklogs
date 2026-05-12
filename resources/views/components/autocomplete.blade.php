@@ -21,7 +21,7 @@
             @if ($selectedId !== '')
                 <button type="button" wire:click="{{ $clearAction }}"
                     class="absolute inset-y-0 right-2 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-                    aria-label="{{ __('Clear selection') }}">
+                    aria-label="Limpar seleção">
                     <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="2" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -45,11 +45,11 @@
                         <button type="button" wire:click="{{ $selectAction }}('{{ $item->id }}')"
                             x-on:click="{{ $alpineOpenVar }} = false"
                             class="flex w-full items-center justify-between px-3 py-2 text-left text-sm transition hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                            <span>{{ __($item->name) }}</span>
+                            <span>{{ $item->name }}</span>
 
                             @if ($selectedId === (string) $item->id)
                                 <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                    {{ __('Selected') }}
+                                    Selecionado
                                 </span>
                             @endif
                         </button>

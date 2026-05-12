@@ -24,7 +24,7 @@ new class extends Component
 
         $todayMinutes = (int) $user->timeEntries()
             ->visible()
-            ->statusNotDraft()
+            ->where('status', 'active')
             ->whereDate('date', Carbon::today())
             ->sum('duration_minutes');
 
@@ -42,7 +42,7 @@ new class extends Component
 
         return (int) $user->timeEntries()
             ->visible()
-            ->statusNotDraft()
+            ->where('status', 'active')
             ->whereDate('date', Carbon::today())
             ->count();
     }

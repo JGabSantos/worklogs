@@ -1,23 +1,17 @@
-<x-layouts::app :title="__('Dashboard')">
+<x-layouts::app title="Dashboard">
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <div class="space-y-8">
             <div class="flex items-center justify-between gap-4">
                 <div>
                     <flux:heading size="xl">
-                        {{ __('Dashboard') }}
+                        Dashboard
                     </flux:heading>
                     <flux:subheading>
-                        {{ __('Get insights into your time entries and manage them effectively.') }}
+                        Acompanhe seus registros de horas e visualize insights sobre sua produtividade.
                     </flux:subheading>
                 </div>
 
                 <div>
-                    <flux:modal.trigger name="time-entries.create" variant="primary">
-                        <flux:button variant="primary" icon="plus">
-                            {{ __('New entry') }}
-                        </flux:button>
-                    </flux:modal.trigger>
-
                     <livewire:time-entries.create />
                 </div>
             </div>
