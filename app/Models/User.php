@@ -14,6 +14,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 
 #[Fillable([
     'name',
+    'username',
     'email',
     'password',
     'profile_id',
@@ -56,11 +57,11 @@ class User extends Authenticatable
 
     public function hasPermission(string $permissionCode): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
 
-        if (!$this->profile || !$this->profile->is_active) {
+        if (! $this->profile || ! $this->profile->is_active) {
             return false;
         }
 
@@ -78,7 +79,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn($word) => Str::substr($word, 0, 1))
+            ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
 }
